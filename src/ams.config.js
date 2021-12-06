@@ -1,4 +1,5 @@
 import ams from "@ams-team/ams";
+import routeList from "./components/routes"
 
 ams.block('template-block', {
   "resources": {
@@ -15,58 +16,11 @@ ams.block('template-block', {
     }
   },
   "blocks": {
-    "routerBlock1": {
+    "routerBlock": {
+      "type": "router",
       "router": {
         "defaultBreadcrumb": true,
-        "routes": [
-          {
-            "path": "contractManage",
-            "name": "合同管理",
-            "meta": {
-              "icon": "ams-icon-system-icon"
-            },
-            "children": [
-              {
-                "name": "合同归档",
-                "path": "contractArchive",
-                "block": "contractArchive"
-              }
-            ]
-          },
-          {
-            "path": "invoiceManage",
-            "name": "发票管理",
-            "block": "invoiceManage",
-            "meta": {
-              "icon": "ams-icon-brand-equity",
-              "hasMenu": true,
-              "hidden": false,
-              "noRedirect": false
-            }
-          },
-          {
-            "name": "新增申请",
-            "path": "invoiceManageApply",
-            "block": "invoiceManageApply",
-            "meta": {
-              "icon": "el-icon-setting",
-              "hasMenu": true,
-              "hidden": true,
-              "noRedirect": false
-            }
-          },
-          {
-            "path": "setting",
-            "name": "基础设置",
-            "block": "setting",
-            "meta": {
-              "icon": "el-icon-setting",
-              "hasMenu": true,
-              "hidden": false,
-              "noRedirect": false
-            }
-          }
-        ]
+        "routes": routeList.routes
       },
       "blocks": {
         "contractArchive": {
@@ -148,11 +102,11 @@ ams.block('template-block', {
                         "label": "所属公司",
                         "type": "text"
                       },
-                      "part": {
+                      "dept": {
                         "label": "所属部门",
                         "type": "text"
                       },
-                      "contractNumber": {
+                      "contractNum": {
                         "label": "合同编号",
                         "type": "text"
                       },
@@ -167,10 +121,98 @@ ams.block('template-block', {
                       "successCode": 0
                     },
                   },
+                  "operations": {
+                    "check": {
+                      "type": "button",
+                      "label": "查看",
+                      "props": {
+                        "size": "mini"
+                      }
+                    },
+                    "lawArchive": {
+                      "type": "button",
+                      "label": "归档",
+                      "props": {
+                        "size": "mini",
+                        "type": "primary",
+                      }
+                    },
+                    "lawArchiveCancel": {
+                      "type": "button",
+                      "label": "取消",
+                      "props": {
+                        "size": "mini",
+                        "type": "info",
+                      }
+                    }
+                  },
                   "events": {
-                    "init": "@list"
+                    "init": "@list",
+                    "check": "@contractListCheckDialog.show"
+                  },
+                  "actions": {
+                    "list": function(...args) {
+                      return new Promise((resolve, reject) => {
+                        this.$ams.actions.list.call(this, {
+                          ...args,
+                          success(res) {
+                            let data = res.data.data;
+
+                            if (res.data.code === 0 && data) {
+                              this.data.list = data.list
+                              this.data.total = data.total
+                              this.renderListDataChangeInfors(data.list)
+                              resolve()
+                            } else {
+                              this.$message.error(`${res.data.msg}(${res.data.code})`)
+                              reject()
+                            }
+                          }
+                        })
+                      })
+                    },
+                    "renderListDataChangeInfors": function(data) {
+                      data.forEach(element => {
+                        element.lawArchive == 1 ? element.archiveType = '已归档' : element.archiveType = '未归档';
+                        element.contractStatus == 1 ? element.contractType = '开启' : element.contractType = '关闭';
+                      })
+                    }
                   }
                 },
+                "contractListCheckDialog": {
+                  "type": "dialog",
+                  "operations": {
+                    "submit": {
+                      "type": "button",
+                      "label": "已阅",
+                      "props": {
+                        "type": "primary"
+                      }
+                    },
+                    "hide": {
+                      "type": "button",
+                      "label": "关闭"
+                    },
+                  },
+                  "actions": {
+                    "submit": function() {
+                      this.$message("你点击了已阅按钮")
+                    }
+                  },
+                  "blocks": {
+                    "dialogText": {
+                      "type": "component",
+                      "options": {
+                        "is": "div",
+                        "text": "我是弹窗内容"
+                      }
+                    }
+                  },
+                  "style": {
+                    "width": "30%",
+                    "margin": "0 auto"
+                  }
+                }
               }
             }
           }
@@ -204,7 +246,7 @@ ams.block('template-block', {
               "api": {
                 "contentType": "form",
                 "prefix": "http://rap2api.taobao.org/app/mock/293650/",
-                "create": "create",
+                "create": "createContractApply",
                 "successCode": 0
               },
               "prop": {
@@ -218,36 +260,36 @@ ams.block('template-block', {
                 "company_name": {
                   "type": "text",
                   "label": "公司",
-                  "rules": [{
-                    "required": true,
-                    "message": "请输入公司",
-                    "trigger": "blur"
-                  }, {
-                    "min": 1,
-                    "max": 30,
-                    "message": "长度在 1 到 30 个字符",
-                    "trigger": "blur"
-                  }],
-                  "props": {
-                    "placeholder": "请输入字符，长度在 1 到 30 个"
-                  }
+                  "default": "公司名称1",
+                  "rules": [
+                    {
+                      "required": true,
+                      "message": "请输入公司",
+                      "trigger": "blur"
+                    }, {
+                      "min": 1,
+                      "max": 30,
+                      "message": "长度在 1 到 30 个字符",
+                      "trigger": "blur"
+                    }
+                  ]
                 },
                 "contract_name": {
                   "type": "text",
                   "label": "合同名称",
-                  "rules": [{
-                    "required": true,
-                    "message": "请输入合同名称",
-                    "trigger": "blur"
-                  }, {
-                    "min": 1,
-                    "max": 30,
-                    "message": "长度在 1 到 30 个字符",
-                    "trigger": "blur"
-                  }],
-                  "props": {
-                    "placeholder": "请输入字符，长度在 1 到 30 个"
-                  }
+                  "default": "合同名称1",
+                  "rules": [
+                    {
+                      "required": true,
+                      "message": "请输入合同名称",
+                      "trigger": "blur"
+                    }, {
+                      "min": 1,
+                      "max": 30,
+                      "message": "长度在 1 到 30 个字符",
+                      "trigger": "blur"
+                    }
+                  ]
                 },
                 "contract_type": {
                   "type": "select",
@@ -255,7 +297,6 @@ ams.block('template-block', {
                   "default": "0",
                   "props": {
                     "placeholder": "请选择",
-                    
                     "multiple": false,
                     "options": {
                       "0": "未归档",
@@ -271,18 +312,18 @@ ams.block('template-block', {
           },
           "blocks": {
             "invoiceManageApplyComponent": {
+              "ctx": "edit",
               "type": "form",
-              "fields": {
-                "id": false,
-                "companyName": false,
-                "contractName": false,
-                "contractType": false
+              data: {
+                id: "",
+                companyName: "",
+                contractName: "",
+                contractType: ""
               },
               "resource": "invoiceManageApplyResource",
               "style": {
                 "width": "30%"
               },
-              "ctx": "edit",
               "operations": {
                 "submit": {
                   "type": "button",
@@ -293,17 +334,14 @@ ams.block('template-block', {
                 }
               },
               "events": {
-                "submit": "@validate @confirm:确认提交吗? @create"
+                "submit": "@validate @confirm:确认提交吗? @return"
               },
               "actions": {
                 "cancel": function() {
                   this.$message.success("取消成功")
                 },
-                "create": function() {
-                  this.$message.success("提交成功")
-                },
-                "confirm": function() {
-                  console.log('1')
+                "return": function() {
+                  this.$router.push({path:'contractManage/contractArchive'})
                 }
               }
             }
@@ -315,8 +353,7 @@ ams.block('template-block', {
 
           }
         }
-      },
-      "type": "router"
+      }
     }
   },
   "config": {

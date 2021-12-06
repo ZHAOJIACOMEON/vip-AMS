@@ -34,7 +34,8 @@ module.exports = {
     headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type'
-    }
+    },
+    disableHostCheck: true
   },
   // // publicPath: "./",
   chainWebpack: (config) => {
