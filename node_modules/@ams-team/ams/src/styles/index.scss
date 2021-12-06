@@ -1,0 +1,143 @@
+html,
+body {
+    height: 100%;
+    box-sizing: border-box;
+}
+body {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-family: Microsoft YaHei, Arial, sans-serif;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+a,
+a:focus,
+a:hover {
+    cursor: pointer;
+    color: inherit;
+    outline: none;
+    text-decoration: none;
+}
+
+div:focus {
+    outline: none;
+}
+
+a:focus,
+a:active {
+    outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+}
+
+.clearfix {
+    &:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: ' ';
+        clear: both;
+        height: 0;
+    }
+}
+
+.el-image-viewer__close{
+    color: #fff;
+}
+
+
+.ams-field-radio-edit{
+    // 去除button-radio背景和radio间距
+    .el-radio-group {
+        -webkit-appearance: none;
+        line-height: 40px;
+        font-size: 14px;
+    }
+    // 去除带边框radio右边距
+    .el-radio.is-bordered{
+        margin-right: 0px;
+    }
+}
+.ams-field-checkbox-edit{
+    // 去除button-radio背景和radio间距
+    .el-checkbox-group {
+        -webkit-appearance: none;
+        line-height: 40px;
+        font-size: 14px;
+    }
+    // 去除带边框radio右边距
+    .el-checkbox.is-bordered{
+        margin-right: 0px;
+    }
+}
+
+
+// 处理label文案过长时行高和居中的问题
+// .el-form-item__label{
+//     word-break: break-all;
+//     display: flex;
+//     justify-content: center;
+//     flex-direction: column;
+// }
+// .el-form-item {
+//     .el-form-item__label{
+//         height: 40px;
+//         line-height: initial;
+//     }
+//     &.el-form-item--mini{
+//         .el-form-item__label{
+//             height: 28px;
+//             line-height: initial;
+//         }
+//     }
+//     &.el-form-item--small{
+//         .el-form-item__label{
+//             height: 32px;
+//             line-height: initial;
+//         }
+//     }
+//     &.el-form-item--medium{
+//         .el-form-item__label{
+//             height: 36px;
+//             line-height: initial;
+//         }
+//     }
+// }
+
+// 处理operation按钮同时为el-badge是，无法和旁边元素上下对齐的bug
+.el-badge.ams-operation{
+    vertical-align: initial;
+    line-height: initial;
+}
+.el-badge.ams-field{
+    vertical-align: initial;
+}
+
+// 搜索可配置换行
+.ams-block-list, .ams-block-imagelist{
+    >.ams-operations.el-form--inline {
+        .el-form-item{
+            float: left;
+            &.el-form-item--block{
+                clear: both;
+            }
+        }
+    }
+}
+
+// 解决表格loading弹层 层级问题
+.el-table{
+    z-index: 1;
+}
